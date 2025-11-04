@@ -1,0 +1,2 @@
+# This file ensures the saved_models directory is tracked by Git
+# Trained model files (.pkl, .h5, .pt, etc.) will be saved here
