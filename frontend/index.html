@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Text Classification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .input-section textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            min-height: 200px;
+            transition: border-color 0.3s;
+        }
+
+        .input-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .classify-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: 600;
+        }
+
+        .classify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .classify-btn:active {
+            transform: translateY(0);
+        }
+
+        .classify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .specialty {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .confidence {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .top-predictions {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .top-predictions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .prediction-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prediction-name {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .prediction-confidence {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .demo-mode {
+            background: #ffa500;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .classify-btn {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Medical Text Classification</h1>
+            <p>Classify medical transcriptions into appropriate specialties</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="demoMode" class="demo-mode" style="display: none;">
+            ⚠️ Demo Mode: Model not loaded. Please train a model first.
+        </div>
+
+        <div class="input-section">
+            <label for="medicalText">Enter Medical Transcription Text:</label>
+            <textarea 
+                id="medicalText" 
+                placeholder="Example: The patient presents with severe headache and dizziness. Neurological examination shows normal reflexes. MRI scan scheduled for further investigation..."
+            ></textarea>
+        </div>
+
+        <div class="button-section">
+            <button id="classifyBtn" class="classify-btn" onclick="classifyText()">
+                🔍 Classify Text
+            </button>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Analyzing text...</p>
+        </div>
+
+        <div id="results" class="results-section">
+            <div class="result-card">
+                <h2>🎯 Classification Result</h2>
+                <div class="specialty" id="specialty"></div>
+                <div class="confidence" id="confidence"></div>
+            </div>
+
+            <div class="top-predictions">
+                <h3>📈 Top Predictions</h3>
+                <div id="topPredictions"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Medical Text Classification System v1.0</p>
+            <p>Built with Flask + Machine Learning</p>
+        </div>
+    </div>
+
+    <script>
+        // Check model status on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (!data.model_loaded) {
+                    document.getElementById('demoMode').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Health check failed:', error);
+            }
+        });
+
+        async function classifyText() {
+            const textArea = document.getElementById('medicalText');
+            const text = textArea.value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+            const classifyBtn = document.getElementById('classifyBtn');
+
+            // Reset
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            resultsDiv.style.display = 'none';
+
+            // Validation
+            if (!text) {
+                errorDiv.textContent = '⚠️ Please enter medical text to classify.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Show loading
+            loadingDiv.style.display = 'block';
+            classifyBtn.disabled = true;
+
+            try {
+                // Make API call
+                const response = await fetch('/api/classify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Classification failed');
+                }
+
+                // Display results
+                displayResults(data);
+
+            } catch (error) {
+                errorDiv.textContent = '❌ Error: ' + error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+                classifyBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Show results section
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+
+            // Display specialty
+            document.getElementById('specialty').textContent = data.specialty;
+
+            // Display confidence
+            const confidencePercent = (data.confidence * 100).toFixed(1);
+            document.getElementById('confidence').textContent = 
+                `Confidence: ${confidencePercent}%`;
+
+            // Display top predictions
+            const topPredictionsDiv = document.getElementById('topPredictions');
+            topPredictionsDiv.innerHTML = '';
+
+            if (data.top_predictions) {
+                data.top_predictions.forEach((pred, index) => {
+                    const predDiv = document.createElement('div');
+                    predDiv.className = 'prediction-item';
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'prediction-name';
+                    nameSpan.textContent = `${index + 1}. ${pred.specialty}`;
+                    
+                    const confSpan = document.createElement('span');
+                    confSpan.className = 'prediction-confidence';
+                    confSpan.textContent = `${(pred.confidence * 100).toFixed(1)}%`;
+                    
+                    predDiv.appendChild(nameSpan);
+                    predDiv.appendChild(confSpan);
+                    topPredictionsDiv.appendChild(predDiv);
+                });
+            }
+
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Allow Enter key to submit (Ctrl+Enter)
+        document.getElementById('medicalText').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                classifyText();
+            }
+        });
+    </script>
+</body>
+</html>
