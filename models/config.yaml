@@ -1,0 +1,237 @@
+# Medical Text Classification - Model Configuration
+# This file contains configuration parameters for model training and inference
+
+# Model Selection
+model:
+  # Choose model type: 'naive_bayes', 'logistic_regression', 'svm', 'random_forest', 'neural_network'
+  type: 'logistic_regression'
+  
+  # Model-specific parameters
+  parameters:
+    # Logistic Regression
+    logistic_regression:
+      max_iter: 1000
+      C: 1.0
+      solver: 'lbfgs'
+      multi_class: 'multinomial'
+      random_state: 42
+    
+    # Support Vector Machine
+    svm:
+      C: 1.0
+      kernel: 'linear'
+      gamma: 'scale'
+      random_state: 42
+    
+    # Random Forest
+    random_forest:
+      n_estimators: 100
+      max_depth: null
+      min_samples_split: 2
+      min_samples_leaf: 1
+      random_state: 42
+    
+    # Naive Bayes
+    naive_bayes:
+      alpha: 1.0
+    
+    # Neural Network
+    neural_network:
+      hidden_layer_sizes: [128, 64]
+      activation: 'relu'
+      solver: 'adam'
+      alpha: 0.0001
+      batch_size: 32
+      learning_rate: 'adaptive'
+      max_iter: 200
+      random_state: 42
+
+# Text Preprocessing
+preprocessing:
+  # Convert text to lowercase
+  lowercase: true
+  
+  # Remove special characters and numbers
+  remove_special_chars: true
+  remove_numbers: false
+  
+  # Tokenization
+  tokenize: true
+  
+  # Stop words removal
+  remove_stopwords: true
+  stopwords_language: 'english'
+  
+  # Stemming/Lemmatization
+  lemmatize: true
+  stem: false
+  
+  # Minimum word length to keep
+  min_word_length: 2
+  
+  # Maximum text length (characters)
+  max_text_length: 10000
+
+# Feature Extraction
+feature_extraction:
+  # Vectorizer type: 'tfidf' or 'count'
+  vectorizer: 'tfidf'
+  
+  # TF-IDF parameters
+  tfidf:
+    max_features: 5000
+    min_df: 2
+    max_df: 0.8
+    ngram_range: [1, 2]
+    use_idf: true
+    smooth_idf: true
+    sublinear_tf: true
+  
+  # Count Vectorizer parameters
+  count:
+    max_features: 5000
+    min_df: 2
+    max_df: 0.8
+    ngram_range: [1, 2]
+
+# Training Configuration
+training:
+  # Train-test split ratio
+  test_size: 0.2
+  validation_size: 0.1
+  
+  # Random state for reproducibility
+  random_state: 42
+  
+  # Cross-validation folds
+  cv_folds: 5
+  
+  # Class balancing
+  balance_classes: true
+  balancing_strategy: 'oversample'  # 'oversample', 'undersample', or 'smote'
+  
+  # Early stopping
+  early_stopping: true
+  patience: 10
+
+# Hyperparameter Tuning
+hyperparameter_tuning:
+  # Enable grid search
+  enabled: false
+  
+  # Search type: 'grid' or 'random'
+  search_type: 'grid'
+  
+  # Number of iterations for random search
+  n_iter: 20
+  
+  # Cross-validation folds for tuning
+  cv_folds: 3
+  
+  # Scoring metric
+  scoring: 'f1_weighted'
+
+# Evaluation Metrics
+evaluation:
+  # Primary metrics to track
+  metrics:
+    - 'accuracy'
+    - 'precision'
+    - 'recall'
+    - 'f1_score'
+    - 'roc_auc'
+  
+  # Average method for multi-class metrics
+  average: 'weighted'
+  
+  # Generate confusion matrix
+  confusion_matrix: true
+  
+  # Generate classification report
+  classification_report: true
+
+# Model Persistence
+persistence:
+  # Directory to save models
+  model_dir: 'models/saved_models'
+  
+  # Directory to save vectorizers
+  vectorizer_dir: 'models/saved_models'
+  
+  # Model file naming convention
+  model_name_format: '{model_type}_{timestamp}.pkl'
+  
+  # Save training history
+  save_history: true
+  history_dir: 'models/training_history'
+
+# Logging
+logging:
+  # Log level: 'DEBUG', 'INFO', 'WARNING', 'ERROR'
+  level: 'INFO'
+  
+  # Log to file
+  log_to_file: true
+  log_dir: 'logs'
+  log_file: 'training.log'
+  
+  # Console logging
+  console_output: true
+
+# Data Paths
+data:
+  # Raw data directory
+  raw_dir: 'data/raw'
+  raw_file: 'MTSamples.csv'
+  
+  # Processed data directory
+  processed_dir: 'data/processed'
+  
+  # Column names in dataset
+  text_column: 'transcription'
+  label_column: 'medical_specialty'
+  
+  # Minimum samples per class
+  min_samples_per_class: 10
+
+# Inference Configuration
+inference:
+  # Default model to use
+  default_model: 'best_model.pkl'
+  
+  # Confidence threshold
+  confidence_threshold: 0.5
+  
+  # Number of top predictions to return
+  top_k: 3
+  
+  # Batch prediction settings
+  batch_size: 32
+
+# Experiment Tracking
+experiment:
+  # Experiment name
+  name: 'medical_text_classification'
+  
+  # Track experiments with MLflow
+  use_mlflow: false
+  mlflow_uri: 'http://localhost:5000'
+  
+  # Save experiment metadata
+  save_metadata: true
+  metadata_dir: 'experiments'
+
+# Performance
+performance:
+  # Use parallel processing
+  n_jobs: -1
+  
+  # Cache vectorizer
+  cache_vectorizer: true
+  
+  # Memory mapping for large datasets
+  use_memory_mapping: false
+
+# Version
+config_version: '1.0.0'
+last_updated: '2025-11-04'
